@@ -1,0 +1,131 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <script src="https://cdn.tailwindcss.com"></script>
+{% endblock stylesheets %}
+
+{% block body %}
+    <div>
+        <h2>Notifications</h2>
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div>{{ type }} - {{ message }}</div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <div class="w-full grid grid-cols-2">
+        <div>
+            <h1>Custom XML send</h1>
+            <form action="{{ path('dashboard') }}" method="post">
+                <label for="xml">XML row</label>
+                <textarea class="border border-gray-300 rounded p-2 w-full h-96" id="xml" name="xml"></textarea>
+                <input class="border border-red-200 bg-red-100 rounded p-2 w-full" type="submit" value="Send">
+            </form>
+        </div>
+        <div>
+            <h2>Updates</h2>
+            {% for update in updates %}
+                <div>
+                    <div class="flex gap-4">
+                        <span class="text-red-500">ID:</span> {{ update.id }}
+                        <span class="text-red-500">Chat:</span>
+                        {{ update.chat.jid }}
+                        ->
+                        <span class="text-red-500">From:</span>
+                        {{ update.message.from.fullyQualifiedNick }}
+                        ->
+                    </div>
+                    <div>
+                        <span class="text-red-500">Message:</span>
+                        {{ update.message.text }}
+                    </div>
+                </div>
+                <hr>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <form action="{{ path('dashboard') }}" method="post">
+            <div class="w-full flex gap-4">
+                <input class="border border-red-200 bg-red-100 rounded p-2 w-full cursor-pointer" type="submit" name="GetRoster" value="GetRoster">
+                <input class="border border-red-200 bg-red-100 rounded p-2 w-full cursor-pointer" type="submit" name="ListSubscriptions" value="ListSubscriptions">
+                <input class="border border-red-200 bg-red-100 rounded p-2 w-full cursor-pointer" type="submit" name="GetChats" value="GetChats">
+            </div>
+        </form>
+        <form action="{{ path('dashboard') }}" method="post">
+            <div class="w-full flex gap-4">
+                <label for="SubscribeTarget">SubscribeTarget</label>
+                <input class="border border-red-200 bg-red-100 rounded p-2 w-full" type="text" id="SubscribeTarget" name="SubscribeTarget">
+                <input class="border border-red-200 bg-red-100 rounded p-2 w-full cursor-pointer" type="submit" value="Subscribe">
+            </div>
+        </form>
+        <form action="{{ path('dashboard') }}" method="post">
+            <div class="w-full flex gap-4">
+                <label for="UnsubscribeTarget">UnsubscribeTarget</label>
+                <input class="border border-red-200 bg-red-100 rounded p-2 w-full" type="text" id="UnsubscribeTarget" name="UnsubscribeTarget">
+                <input class="border border-red-200 bg-red-100 rounded p-2 w-full cursor-pointer" type="submit" value="Unsubscribe">
+            </div>
+        </form>
+        <form action="{{ path('dashboard') }}" method="post">
+            <div class="w-full flex gap-4">
+                <label for="RemoveFromRosterTarget">RemoveFromRosterTarget</label>
+                <input class="border border-red-200 bg-red-100 rounded p-2 w-full" type="text" id="RemoveFromRosterTarget" name="RemoveFromRosterTarget">
+                <input class="border border-red-200 bg-red-100 rounded p-2 w-full cursor-pointer" type="submit" value="RemoveFromRoster">
+            </div>
+        </form>
+    </div>
+
+    <div>
+        <h2>Actual roster</h2>
+        {% if latestRosterJob is not null %}
+            {% for latestRosterItem in latestRosterItems %}
+                {{ latestRosterItem.jid }} -> {{ latestRosterItem.name }} -> {{ latestRosterItem.subscription }}
+                <br>
+            {% endfor %}
+        {% else %}
+            <div>No actual roster data</div>
+        {% endif %}
+    </div>
+
+    <div>
+        <br>
+        <h2>Actual chats</h2>
+        {% if latestChatsItems is not null %}
+            {% for item in latestChatsItems %}
+                {{ item.jid }} -> {{ item.name }}
+                <br>
+            {% endfor %}
+        {% else %}
+            <div>No actual roster data</div>
+        {% endif %}
+        <br>
+    </div>
+
+    <div>
+        <h2>Actual jobs</h2>
+        {% for job in jobs %}
+            <div class="flex gap-2">
+                <div>{{ job.id }} -> {{ job.type.value }} -> created: {{ job.createdAt|date('Y-m-d H:i:s') }} finished: {% if job.completedAt is not null %}{{ job.completedAt|date('Y-m-d H:i:s') }}{% else %}-{% endif %}</div>
+                <div>{{ job.payload|json_encode(constant('JSON_PRETTY_PRINT')) }} -> {{ job.resultPayload|json_encode(constant('JSON_PRETTY_PRINT')) }}</div>
+            </div>
+            <hr>
+            <br>
+            <br>
+        {% endfor %}
+    </div>
+
+    <div>
+        <h2>Received unknown XMLs</h2>
+        {% for xml in unknownXmls %}
+            <div class="flex gap-2">
+                <div>{{ xml.createdAt|date('Y-m-d H:i:s') }}</div>
+                <pre>{{ xml.payload|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+            </div>
+            <hr>
+            <br>
+            <br>
+        {% endfor %}
+    </div>
+{% endblock body %}

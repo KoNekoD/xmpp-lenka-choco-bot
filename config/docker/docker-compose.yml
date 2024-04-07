@@ -1,0 +1,31 @@
+version: "3.8"
+
+name: lenka
+
+services:
+  lenka-php-fpm:
+    container_name: lenka-php-fpm
+    user: app
+    build:
+      context: ./../../
+      dockerfile: ./config/docker/Dockerfile
+      args:
+        - APP_ENV=dev
+        - PUID=1000
+        - PGID=1000
+        - SUPERVISOR_RPC_PORT=9551
+        - SUPERVISOR_RPC_USERNAME=lenka
+        - SUPERVISOR_RPC_PASSWORD=lenka
+        - PHP_IDE_CONFIG=serverName=Docker
+        - DEV_XDEBUG_AUTOSTART=trigger
+        - DEV_HOST_IP=172.18.4.1
+        - DEV_XDEBUG_IDE_KEY=PHPSTORM
+    volumes:
+      - ./../../:/var/www/lenka:cached
+    networks:
+      - lenka_network
+
+networks:
+  lenka_network:
+    name: lenka_network
+    external: true

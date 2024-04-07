@@ -1,0 +1,26 @@
+version: "3.8"
+
+name: lenka
+
+services:
+  lenka-php-fpm:
+    container_name: lenka-php-fpm
+    build:
+      context: ./../../
+      dockerfile: ./config/docker/Dockerfile
+      args:
+        - APP_ENV=${APP_ENV}
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - SUPERVISOR_RPC_PORT=${SUPERVISOR_RPC_PORT}
+        - SUPERVISOR_RPC_USERNAME=${SUPERVISOR_RPC_USERNAME}
+        - SUPERVISOR_RPC_PASSWORD=${SUPERVISOR_RPC_PASSWORD}
+    ports:
+      - ${SUPERVISOR_RPC_PORT}:${SUPERVISOR_RPC_PORT}
+    networks:
+      - lenka_network
+
+networks:
+  lenka_network:
+    name: lenka_network
+    external: true

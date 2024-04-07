@@ -1,0 +1,20 @@
+parameters:
+  xmpp.host: '404.city'
+  xmpp.username: '%env(XMPP_USERNAME)%'
+  xmpp.password: '%env(XMPP_PASSWORD)%'
+  xmpp.resource: 'SymfonyLenka'
+  xmpp.port: 5222
+  xmpp.use_tls: true
+  xmpp.auth_type: 'PLAIN'
+
+services:
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+  App\:
+    resource: '../src/'
+    exclude:
+      - '../src/DependencyInjection/'
+      - '../src/Entity/'
+      - '../src/Kernel.php'

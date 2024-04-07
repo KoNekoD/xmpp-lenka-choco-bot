@@ -1,0 +1,34 @@
+framework:
+  messenger:
+    transports:
+      message_transport: &message_transport
+        dsn: 'sync://'
+        serializer: messenger.transport.symfony_serializer
+        failure_transport: failed
+        retry_strategy: &default_retry_strategy
+          # retries during 1.5 hours
+          max_retries: 10
+          # initial delay
+          delay: 1000
+          # each retry has delay = previous delay * 4
+          multiplier: 4
+          max_delay: 900000
+      update_handle:
+        <<: *message_transport
+        dsn: '%env(AMQP_LENKA_DSN)%/update_handle'
+      new_xml_element:
+        <<: *message_transport
+        dsn: '%env(AMQP_LENKA_DSN)%/new_xml_element'
+      failed:
+        <<: *message_transport
+        dsn: '%env(AMQP_LENKA_DSN)%/failed'
+      sync: 'sync://'
+    routing:
+      'App\Message\UpdateHandleMessage': update_handle
+      'App\Message\NewXmlElementMessage': new_xml_element
+
+when@test:
+  framework:
+    messenger:
+      transports:
+        async: 'sync://'
