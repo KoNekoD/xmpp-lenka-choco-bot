@@ -11,7 +11,7 @@ RUN set -eux && \
     mkdir -p /var/log/supervisor /etc/supervisor/conf.d/ && \
     install-php-extensions \
       @composer intl zip opcache pdo pdo_pgsql \
-      pcntl sockets apcu amqp redis xsl
+      pcntl sockets amqp redis xsl
 
 ARG APP_ENV=dev
 ARG SCRIPT_URL='https://dl.cloudsmith.io/public/symfony/stable/setup.alpine.sh'
