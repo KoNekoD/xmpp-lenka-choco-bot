@@ -9,9 +9,7 @@ RUN set -eux && \
     && \
     rm -f /etc/nginx/nginx.conf /etc/nginx/conf.d/default.conf && \
     mkdir -p /var/log/supervisor /etc/supervisor/conf.d/ && \
-    touch /var/log/xdebug.log && chmod 0666 /var/log/xdebug.log
-
-RUN install-php-extensions \
+    install-php-extensions \
       @composer intl zip opcache pdo pdo_pgsql \
       pcntl sockets apcu amqp redis xsl
 
@@ -24,6 +22,7 @@ ARG DEV_HOST_IP=172.18.4.1
 ARG DEV_XDEBUG_IDE_KEY=PHPSTORM
 RUN if [ "$APP_ENV" = "dev" ]; then \
       install-php-extensions xdebug gd && \
+      touch /var/log/xdebug.log && chmod 0666 /var/log/xdebug.log && \
       cd /usr/local/etc/php/conf.d/ && \
       echo "xdebug.mode=debug" >> docker-php-ext-xdebug.ini; \
       echo "xdebug.start_with_request=$DEV_XDEBUG_AUTOSTART" >> docker-php-ext-xdebug.ini; \
@@ -64,13 +63,10 @@ RUN if [ "$APP_ENV" != "dev" ]; then  \
       bin/console secrets:decrypt-to-local -e "$APP_ENV" && \
       composer dump-env "$APP_ENV" && \
       composer run post-install-cmd && \
-      rm -r var; \
-    fi && \
-    mkdir -p var && chmod -R g+w var && chgrp -R www-data var
+      chmod -R g+w var && chgrp -R www-data var; \
+    fi
 
 USER www-data
-RUN if [ "$APP_ENV" != "dev" ]; then bin/console cache:clear; fi;
 EXPOSE 8080
-EXPOSE $SUPERVISOR_RPC_PORT
 
 CMD ["/usr/bin/supervisord"]
